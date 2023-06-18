@@ -19,6 +19,8 @@ import {RequestExecutionExceptionFilter} from './base/infrastructure/filters/Req
 import {InitModule} from './init/infrastructure/InitModule';
 import {NotifierModule} from './notifier/infrastructure/NotifierModule';
 import {TeacherModule} from './teacher/infrastructure/TeacherModule';
+import {GroupModule} from './group/infrastructure/GroupModule';
+import {EventModule} from './event/infrastructure/EventModule';
 
 @Module({
     imports: [
@@ -48,6 +50,8 @@ import {TeacherModule} from './teacher/infrastructure/TeacherModule';
         UserModule,
         NotifierModule,
         TeacherModule,
+        GroupModule,
+        EventModule,
     ].filter(Boolean),
     providers: [
         MigrateCommand,

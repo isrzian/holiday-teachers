@@ -4,48 +4,49 @@ import {
     RelationField,
     RelationIdField,
     StringField,
+    UpdateTimeField,
 } from '@steroidsjs/nest/src/infrastructure/decorators/fields';
+import {TeacherModel} from '../../../teacher/domain/models/TeacherModel';
 import {GroupModel} from '../../../group/domain/models/GroupModel';
-import {EventModel} from '../../../event/domain/models/EventModel';
 
-export class TeacherModel {
+export class EventModel {
     @PrimaryKeyField()
     id: number;
 
     @StringField()
     name: string;
 
-    @StringField()
-    phone: string;
+    @RelationIdField({
+        relationName: 'teachers',
+        isArray: true,
+    })
+    teachersIds: number[];
+
+    @RelationField({
+        type: 'ManyToMany',
+        isOwningSide: true,
+        relationClass: () => TeacherModel,
+        isArray: true,
+    })
+    teachers: TeacherModel[];
 
     @RelationIdField({
         relationName: 'groups',
         isArray: true,
     })
-    groupsIds: number[]
+    groupsIds: number[];
 
     @RelationField({
         type: 'ManyToMany',
+        isOwningSide: true,
         relationClass: () => GroupModel,
-        isOwningSide: false,
         isArray: true,
     })
     groups: GroupModel[];
 
-    @RelationIdField({
-        relationName: 'events',
-        isArray: true,
-    })
-    eventsIds: number[];
-
-    @RelationField({
-        type: 'ManyToMany',
-        relationClass: () => EventModel,
-        isOwningSide: false,
-        isArray: true,
-    })
-    events: EventModel[];
-
     @CreateTimeField()
-    createDate: string;
+    createTime: string;
+
+    @UpdateTimeField()
+    updateTime: string;
 }

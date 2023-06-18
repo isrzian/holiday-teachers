@@ -3,34 +3,30 @@ import {
     PrimaryKeyField,
     RelationField,
     RelationIdField,
-    StringField,
+    StringField, UpdateTimeField,
 } from '@steroidsjs/nest/src/infrastructure/decorators/fields';
-import {GroupModel} from '../../../group/domain/models/GroupModel';
+import {TeacherModel} from '../../../teacher/domain/models/TeacherModel';
 import {EventModel} from '../../../event/domain/models/EventModel';
 
-export class TeacherModel {
+export class GroupModel {
     @PrimaryKeyField()
     id: number;
 
     @StringField()
     name: string;
 
-    @StringField()
-    phone: string;
-
     @RelationIdField({
-        relationName: 'groups',
+        relationName: 'teachers',
         isArray: true,
     })
-    groupsIds: number[]
+    teachersIds: number[];
 
     @RelationField({
         type: 'ManyToMany',
-        relationClass: () => GroupModel,
-        isOwningSide: false,
-        isArray: true,
+        relationClass: () => TeacherModel,
+        isOwningSide: true,
     })
-    groups: GroupModel[];
+    teachers: TeacherModel[];
 
     @RelationIdField({
         relationName: 'events',
@@ -48,4 +44,7 @@ export class TeacherModel {
 
     @CreateTimeField()
     createDate: string;
+
+    @UpdateTimeField()
+    updateTime: string;
 }
