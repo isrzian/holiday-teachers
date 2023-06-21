@@ -10,7 +10,7 @@ export class EventService extends CrudService<EventModel,
     protected modelClass = EventModel;
 
     constructor(
-        /** UserRepository */
+        /** EventRepository */
         public repository: IEventRepository,
     ) {
         super();

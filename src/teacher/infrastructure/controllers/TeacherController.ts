@@ -3,7 +3,6 @@ import {ApiBody, ApiOkResponse, ApiQuery} from '@nestjs/swagger';
 import {TeacherService} from '../../domain/services/TeacherService';
 import {TeacherSearchDto} from '../../domain/dtos/TeacherSearchDto';
 import {TeacherModel} from '../../domain/models/TeacherModel';
-import {TeacherSaveDto} from '../../domain/dtos/TeacherSaveDto';
 
 @Controller('/teacher')
 export class TeacherController {
@@ -28,19 +27,19 @@ export class TeacherController {
     }
 
     @Post()
-    @ApiBody({type: TeacherSaveDto})
+    @ApiBody({type: TeacherModel})
     @ApiOkResponse({type: TeacherModel, isArray: false})
     async create(
-        @Body() dto: TeacherSaveDto,
+        @Body() dto: TeacherModel,
     ) {
         return this.service.create(dto);
     }
 
     @Post('/:id')
-    @ApiBody({type: TeacherSaveDto})
+    @ApiBody({type: TeacherModel})
     @ApiOkResponse({type: TeacherModel, isArray: false})
     async update(
-        @Body() dto: TeacherSaveDto,
+        @Body() dto: TeacherModel,
         @Param('id') id: number,
     ) {
         return this.service.update(id, dto);

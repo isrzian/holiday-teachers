@@ -46,6 +46,20 @@ export class TeacherModel {
     })
     events: EventModel[];
 
+    @RelationIdField({
+        relationName: 'organizationEvents',
+        isArray: true,
+    })
+    organizationEventsIds: number[];
+
+    @RelationField({
+        type: 'OneToMany',
+        relationClass: () => EventModel,
+        inverseSide: (event: EventModel) => event.organizer,
+        isArray: true,
+    })
+    organizationEvents: EventModel[];
+
     @CreateTimeField()
     createDate: string;
 }
