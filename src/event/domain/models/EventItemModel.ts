@@ -1,4 +1,5 @@
 import {
+    BooleanField,
     CreateTimeField,
     EnumField,
     IntegerField,
@@ -20,6 +21,9 @@ export class EventItemModel {
 
     @StringField()
     description: string;
+
+    @BooleanField()
+    isMoney: boolean;
 
     @RelationIdField({
         relationName: 'event',

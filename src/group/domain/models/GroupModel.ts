@@ -7,6 +7,7 @@ import {
 } from '@steroidsjs/nest/src/infrastructure/decorators/fields';
 import {TeacherModel} from '../../../teacher/domain/models/TeacherModel';
 import {EventModel} from '../../../event/domain/models/EventModel';
+import {EventItemModel} from '../../../event/domain/models/EventItemModel';
 
 export class GroupModel {
     @PrimaryKeyField()
@@ -41,6 +42,20 @@ export class GroupModel {
         isArray: true,
     })
     events: EventModel[];
+
+    @RelationIdField({
+        relationName: 'items',
+        isArray: true,
+    })
+    itemsIds: number[];
+
+    @RelationField({
+        type: 'OneToMany',
+        relationClass: () => EventItemModel,
+        isArray: true,
+        inverseSide: (item: EventItemModel) => item.event,
+    })
+    items: EventItemModel[];
 
     @CreateTimeField()
     createDate: string;

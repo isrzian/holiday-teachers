@@ -19,4 +19,7 @@ export class EventItemSaveDto {
 
     @ExtendField(EventItemModel)
     status: string;
+
+    @ExtendField(EventItemModel)
+    isMoney: boolean;
 }
