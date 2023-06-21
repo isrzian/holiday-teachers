@@ -1,7 +1,10 @@
 import {ExtendField} from '@steroidsjs/nest/src/infrastructure/decorators/fields/ExtendField';
-import {TeacherModel} from '../models/TeacherModel';
+import {TeacherModel} from '../../domain/models/TeacherModel';
 
-export class TeacherSaveDto {
+export class TeacherSchema {
+    @ExtendField(TeacherModel)
+    id: number;
+
     @ExtendField(TeacherModel)
     name: string;
 
@@ -16,4 +19,7 @@ export class TeacherSaveDto {
 
     @ExtendField(TeacherModel)
     organizationEventsIds: number[];
+
+    @ExtendField(TeacherModel)
+    createDate: string;
 }

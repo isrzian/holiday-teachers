@@ -1,7 +1,10 @@
 import {ExtendField} from '@steroidsjs/nest/src/infrastructure/decorators/fields/ExtendField';
-import {EventModel} from '../models/EventModel';
+import {EventModel} from '../../domain/models/EventModel';
 
-export class EventSaveDto {
+export class EventSchema {
+    @ExtendField(EventModel)
+    id: number;
+
     @ExtendField(EventModel)
     name: string;
 
@@ -34,4 +37,10 @@ export class EventSaveDto {
 
     @ExtendField(EventModel)
     organizerId: number;
+
+    @ExtendField(EventModel)
+    createTime: string;
+
+    @ExtendField(EventModel)
+    updateTime: string;
 }

@@ -21,7 +21,9 @@ export class EventItemModel {
     @StringField()
     description: string;
 
-    @RelationIdField()
+    @RelationIdField({
+        relationName: 'event',
+    })
     eventId: number;
 
     @RelationField({

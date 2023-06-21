@@ -22,7 +22,7 @@ export class TeacherModel {
         relationName: 'groups',
         isArray: true,
     })
-    groupsIds: number[]
+    groupsIds: number[];
 
     @RelationField({
         type: 'ManyToMany',
