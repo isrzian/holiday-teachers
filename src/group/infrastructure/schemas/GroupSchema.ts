@@ -1,7 +1,7 @@
 import {ExtendField} from '@steroidsjs/nest/src/infrastructure/decorators/fields/ExtendField';
-import {GroupModel} from '../models/GroupModel';
+import {GroupModel} from '../../domain/models/GroupModel';
 
-export class GroupSaveDto {
+export class GroupSchema {
     @ExtendField(GroupModel)
     name: string;
 
@@ -13,4 +13,13 @@ export class GroupSaveDto {
 
     @ExtendField(GroupModel)
     itemsIds: number[];
+
+    @ExtendField(GroupModel)
+    id: number;
+
+    @ExtendField(GroupModel)
+    createDate: string;
+
+    @ExtendField(GroupModel)
+    updateTime: string;
 }
