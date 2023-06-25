@@ -41,6 +41,7 @@ const EventPageContent = (props: z.infer<typeof eventSchema>) => {
   const router = useRouter();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const moneyDisclosure = useDisclosure();
   const localizedStartDate = localizeDate(props.startDate);
   const localizedEndDate = localizeDate(props.endDate);
 
@@ -158,7 +159,12 @@ const EventPageContent = (props: z.infer<typeof eventSchema>) => {
           >
             Добавить предмет(-ы)
           </Button>
-          <Button my="5" colorScheme="green" variant="outline" onClick={onOpen}>
+          <Button
+            my="5"
+            colorScheme="green"
+            variant="outline"
+            onClick={moneyDisclosure.onOpen}
+          >
             Сделать вклад в бюджет
           </Button>
         </ButtonGroup>
@@ -210,6 +216,41 @@ const EventPageContent = (props: z.infer<typeof eventSchema>) => {
           </Table>
         </TableContainer>
       </RootLayout>
+      <Modal
+        onClose={moneyDisclosure.onClose}
+        isOpen={moneyDisclosure.isOpen}
+        isCentered
+        size="3xl"
+      >
+        <ModalOverlay />
+        <ModalContent mx="2.5">
+          <ModalHeader>Сделать вклад</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Box>
+              <Stack spacing={4}>
+                <Input
+                  placeholder="Сумма (₽)"
+                  bg={"gray.100"}
+                  border={0}
+                  color={"gray.700"}
+                  _placeholder={{
+                    color: "gray.500",
+                  }}
+                />
+              </Stack>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <ButtonGroup>
+              <Button bgColor={"green.400"} textColor={"white"}>
+                Внести
+              </Button>
+              <Button onClick={moneyDisclosure.onClose}>Отменить</Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Modal onClose={onClose} isOpen={isOpen} isCentered size="3xl">
         <ModalOverlay />
         <ModalContent mx="2.5">

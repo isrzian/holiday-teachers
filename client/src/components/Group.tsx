@@ -24,7 +24,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiTrash } from "react-icons/fi";
 import { z } from "zod";
 import Multiselect from "./Multiselect";
 
@@ -113,13 +113,31 @@ export default function Group({
                 {data.name}
               </Heading>
               <Spacer />
-              <IconButton
-                aria-label={`Редактировать ${data.name}`}
-                variant="outline"
-                onClick={onOpen}
-              >
-                <FiEdit />
-              </IconButton>
+              <ButtonGroup>
+                <IconButton
+                  aria-label={`Редактировать ${data.name}`}
+                  variant="outline"
+                  onClick={onOpen}
+                >
+                  <FiEdit />
+                </IconButton>
+                <IconButton
+                  aria-label={`Удалить ${data.name}`}
+                  variant="outline"
+                  colorScheme="red"
+                  onClick={async () => {
+                    await fetch(`http://localhost:8080/api/v1/group/${id}`, {
+                      method: "DELETE",
+                      headers: {
+                        Accept: "*/*",
+                      },
+                    });
+                    queryClient.invalidateQueries(["groups"]);
+                  }}
+                >
+                  <FiTrash />
+                </IconButton>
+              </ButtonGroup>
             </HStack>
             <Divider mb={5} />
             <HStack>
