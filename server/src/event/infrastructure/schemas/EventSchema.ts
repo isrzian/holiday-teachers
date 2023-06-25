@@ -1,5 +1,6 @@
 import {ExtendField} from '@steroidsjs/nest/src/infrastructure/decorators/fields/ExtendField';
 import {EventModel} from '../../domain/models/EventModel';
+import {TeacherSchema} from '../../../teacher/infrastructure/schemas/TeacherSchema';
 
 export class EventSchema {
     @ExtendField(EventModel)
@@ -19,6 +20,12 @@ export class EventSchema {
 
     @ExtendField(EventModel)
     teachersIds: number[];
+
+    @ExtendField(EventModel, {
+        relationClass: () => TeacherSchema,
+        isArray: true,
+    })
+    teachers: TeacherSchema[];
 
     @ExtendField(EventModel)
     groupsIds: number[];
