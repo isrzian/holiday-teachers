@@ -23,7 +23,7 @@ export class EventController {
     @Get('/:id')
     @ApiOkResponse({type: EventSchema, isArray: false})
     async getOne(@Param('id') id: number) {
-        return this.service.findById(id);
+        return this.service.findById(id, null, EventSchema);
     }
 
     @Post()
