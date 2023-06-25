@@ -45,6 +45,7 @@ export class EventItemModel {
     @EnumField({
         enum: EventItemStatusEnum,
         defaultValue: EventItemStatusEnum.IN_WAREHOUSE,
+        nullable: true,
     })
     status: string;
 
