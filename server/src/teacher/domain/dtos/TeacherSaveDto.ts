@@ -2,18 +2,28 @@ import {ExtendField} from '@steroidsjs/nest/src/infrastructure/decorators/fields
 import {TeacherModel} from '../models/TeacherModel';
 
 export class TeacherSaveDto {
-    @ExtendField(TeacherModel)
+    @ExtendField(TeacherModel, {
+        nullable: true,
+    })
     name: string;
 
-    @ExtendField(TeacherModel)
+    @ExtendField(TeacherModel, {
+        nullable: true,
+    })
     phone: string;
 
-    @ExtendField(TeacherModel)
+    @ExtendField(TeacherModel, {
+        nullable: true,
+    })
     groupsIds: number[];
 
-    @ExtendField(TeacherModel)
+    @ExtendField(TeacherModel, {
+        nullable: true,
+    })
     eventsIds: number[];
 
-    @ExtendField(TeacherModel)
+    @ExtendField(TeacherModel, {
+        nullable: true,
+    })
     organizationEventsIds: number[];
 }

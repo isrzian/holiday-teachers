@@ -2,7 +2,7 @@ import {ExtendField} from '@steroidsjs/nest/src/infrastructure/decorators/fields
 import {EventModel} from '../models/EventModel';
 
 export class EventSaveDto {
-    @ExtendField(EventModel)
+    @ExtendField(EventModel, {nullable: true})
     name: string;
 
     @ExtendField(EventModel)

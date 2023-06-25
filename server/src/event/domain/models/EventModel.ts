@@ -1,6 +1,8 @@
 import {
     CreateTimeField,
-    DateTimeField, EnumField, IntegerField,
+    DateTimeField,
+    EnumField,
+    IntegerField,
     PrimaryKeyField,
     RelationField,
     RelationIdField,
@@ -28,12 +30,14 @@ export class EventModel {
     @EnumField({
         enum: EventStatusEnum,
         defaultValue: EventStatusEnum.PLANNED,
+        nullable: true,
     })
     status: string;
 
     @RelationIdField({
         relationName: 'teachers',
         isArray: true,
+        nullable: true,
     })
     teachersIds: number[];
 
@@ -48,6 +52,7 @@ export class EventModel {
     @RelationIdField({
         relationName: 'groups',
         isArray: true,
+        nullable: true,
     })
     groupsIds: number[];
 
@@ -62,6 +67,7 @@ export class EventModel {
     @RelationIdField({
         relationName: 'items',
         isArray: true,
+        nullable: true,
     })
     itemsIds: number[];
 
