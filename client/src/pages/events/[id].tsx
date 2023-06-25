@@ -24,62 +24,130 @@ import {
   Spacer,
   Button,
   ButtonGroup,
-  IconButton,
   useDisclosure,
   Box,
   Stack,
   Textarea,
   Input,
-  InputGroup,
 } from "@chakra-ui/react";
-import { FiEdit, FiTrash } from "react-icons/fi";
+import TrButton from "@/components/TrButton";
+import { useQuery } from "@tanstack/react-query";
+import { eventSchema } from "@/lib/schema";
+import { z } from "zod";
+import { EventStatus } from "@/lib/consts";
+import { localizeDate } from "@/lib/localizeDate";
 
-const EventPageContent = () => {
+const EventPageContent = (props: z.infer<typeof eventSchema>) => {
+  const router = useRouter();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const localizedStartDate = localizeDate(props.startDate);
+  const localizedEndDate = localizeDate(props.endDate);
+
+  const organizer = useQuery({
+    queryKey: [`teacher/${props.organizerId}`],
+    queryFn: async () => {
+      const res = await fetch(
+        `http://localhost:8080/api/v1/teacher/${props.organizerId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      return res.json();
+    },
+  });
+
+  /* const teachers = useQueries({
+    queries: !!props.teachersIds
+      ? props.teachersIds.map((id) => {
+          return {
+            queryKey: [`teacher/${id}`],
+            queryFn: async () => {
+              const res = await fetch(
+                `http://localhost:8080/api/v1/teacher/${id}`,
+                {
+                  method: "GET",
+                  headers: {
+                    Accept: "application/json",
+                  },
+                }
+              );
+              return res.json();
+            },
+          };
+        })
+      : [],
+  }); */
+
   return (
     <>
       <RootLayout>
         <Flex mt={5} mb={20} flexDir={"column"} gap={2}>
           <HStack>
             <Text
-              color={"yellow.500"}
+              color={
+                props.status === "in_process"
+                  ? "yellow.500"
+                  : props.status === "planned"
+                  ? "purple.500"
+                  : "green.500"
+              }
               textTransform={"uppercase"}
               fontWeight={800}
               fontSize={"xs"}
               letterSpacing={1.1}
             >
-              Планирование
+              {/* @ts-ignore */}
+              {EventStatus[props.status]}
             </Text>
             <Spacer />
             <ButtonGroup>
               <Button>Редактировать</Button>
-              <Button colorScheme="red">Удалить</Button>
+              <Button
+                colorScheme="red"
+                onClick={async () => {
+                  await fetch(
+                    `http://localhost:8080/api/v1/event/${(props as any).id}`,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        Accept: "*/*",
+                      },
+                    }
+                  );
+                  router.push("/events");
+                }}
+              >
+                Удалить
+              </Button>
             </ButtonGroup>
           </HStack>
-          <Text color={"gray.500"}>Июль 09, 2023 - Июль 10, 2023</Text>
+          <Text color={"gray.700"}>
+            {localizedStartDate} - {localizedEndDate}
+          </Text>
           <Heading color={"gray.700"} fontSize={"2xl"} fontFamily={"body"}>
-            Поездка в Ергаки
+            {props.name}
           </Heading>
-          <Text color={"gray.500"}>
-            Приготовьтесь погрузиться в уникальную красоту горной природы и
-            величественные пейзажи Ергаков! Расположенные в Саянских горах,
-            Ергаки предлагают незабываемые приключения для любителей активного
-            отдыха и природных красот.
-          </Text>
-          <Text>
-            <Text as="span" fontWeight="semibold">
-              Организатор:{" "}
+          <Text color={"gray.700"}>{props.description}</Text>
+          {organizer.data && (
+            <Text>
+              <Text as="span" fontWeight="semibold">
+                Организатор:{" "}
+              </Text>
+              {organizer.data.name}
             </Text>
-            Леонид Скорик
-          </Text>
-          <Text>
+          )}
+          {/* <Text>
             <Text as="span" fontWeight="semibold">
               Участники:{" "}
             </Text>
-            Александр Иванов, Екатерина Смирнова, Михаил Кузнецов, Анна Попова,
-            Иван Васильев, Ольга Петрова, Николай Соколов, Мария Морозова,
-            Сергей Новиков, Елена Федорова
-          </Text>
+            {!!teachers && teachers.length > 0
+              ? teachers.map((teacher) => teacher.data.name).join(", ")
+              : "Нет участников мероприятия"}
+          </Text> */}
         </Flex>
         <ButtonGroup>
           <Button
@@ -108,113 +176,27 @@ const EventPageContent = () => {
                 <Th>Описание</Th>
                 <Th>Количество</Th>
                 <Th>Стоимость</Th>
-                <Th>Действия</Th>
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>Мясо для шашлыка</Td>
-                <Td>Шашлык из шеи, домашний маринад</Td>
-                <Td>5 кг</Td>
-                <Td>₽2800</Td>
-                <Td>
-                  <ButtonGroup>
-                    <IconButton
-                      aria-label="редактировать"
-                      size="sm"
-                      variant="outline"
-                      colorScheme="green"
-                    >
-                      <FiEdit />
-                    </IconButton>
-                    <IconButton
-                      aria-label="удалить"
-                      size="sm"
-                      colorScheme="red"
-                      variant="outline"
-                    >
-                      <FiTrash />
-                    </IconButton>
-                  </ButtonGroup>
-                </Td>
-              </Tr>
+              <TrButton id={1} eventId={(props as any).id} />
               <Tr>
                 <Td>Овощи</Td>
                 <Td>Редис, огурцы, помидоры, зеленый лук</Td>
                 <Td>3 кг</Td>
                 <Td>₽900</Td>
-                <Td>
-                  <ButtonGroup>
-                    <IconButton
-                      aria-label="редактировать"
-                      size="sm"
-                      variant="outline"
-                      colorScheme="green"
-                    >
-                      <FiEdit />
-                    </IconButton>
-                    <IconButton
-                      aria-label="удалить"
-                      size="sm"
-                      colorScheme="red"
-                      variant="outline"
-                    >
-                      <FiTrash />
-                    </IconButton>
-                  </ButtonGroup>
-                </Td>
               </Tr>
               <Tr>
                 <Td>Пиво</Td>
                 <Td>Krušovice (Светлое)</Td>
                 <Td>24 бутылки</Td>
                 <Td>₽1900</Td>
-                <Td>
-                  <ButtonGroup>
-                    <IconButton
-                      aria-label="редактировать"
-                      size="sm"
-                      variant="outline"
-                      colorScheme="green"
-                    >
-                      <FiEdit />
-                    </IconButton>
-                    <IconButton
-                      aria-label="удалить"
-                      size="sm"
-                      colorScheme="red"
-                      variant="outline"
-                    >
-                      <FiTrash />
-                    </IconButton>
-                  </ButtonGroup>
-                </Td>
               </Tr>
               <Tr>
                 <Td>Аренда</Td>
                 <Td>Дом, баня, купель</Td>
                 <Td>2 суток</Td>
                 <Td>₽28400</Td>
-                <Td>
-                  <ButtonGroup>
-                    <IconButton
-                      aria-label="редактировать"
-                      size="sm"
-                      variant="outline"
-                      colorScheme="green"
-                    >
-                      <FiEdit />
-                    </IconButton>
-                    <IconButton
-                      aria-label="удалить"
-                      size="sm"
-                      colorScheme="red"
-                      variant="outline"
-                    >
-                      <FiTrash />
-                    </IconButton>
-                  </ButtonGroup>
-                </Td>
               </Tr>
             </Tbody>
             <Tfoot>
@@ -240,7 +222,7 @@ const EventPageContent = () => {
                   placeholder="Наименование"
                   bg={"gray.100"}
                   border={0}
-                  color={"gray.500"}
+                  color={"gray.700"}
                   _placeholder={{
                     color: "gray.500",
                   }}
@@ -249,7 +231,7 @@ const EventPageContent = () => {
                   placeholder="Описание"
                   bg={"gray.100"}
                   border={0}
-                  color={"gray.500"}
+                  color={"gray.700"}
                   _placeholder={{
                     color: "gray.500",
                   }}
@@ -259,7 +241,7 @@ const EventPageContent = () => {
                   placeholder="Количество"
                   bg={"gray.100"}
                   border={0}
-                  color={"gray.500"}
+                  color={"gray.700"}
                   _placeholder={{
                     color: "gray.500",
                   }}
@@ -268,7 +250,7 @@ const EventPageContent = () => {
                   placeholder="Стоимость (₽)"
                   bg={"gray.100"}
                   border={0}
-                  color={"gray.500"}
+                  color={"gray.700"}
                   _placeholder={{
                     color: "gray.500",
                   }}
@@ -297,5 +279,19 @@ const EventPageContent = () => {
 export default function EventId() {
   const { query } = useRouter();
   const id = query.id as string;
-  if (!!id) return <EventPageContent />;
+
+  const event = useQuery({
+    queryKey: [`events/${id}`],
+    queryFn: async () => {
+      const res = await fetch(`http://localhost:8080/api/v1/event/${id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return res.json();
+    },
+  });
+
+  if (!!id) return <EventPageContent {...event.data} />;
 }

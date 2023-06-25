@@ -5,8 +5,27 @@ export default NextAuth({
   pages: {
     signIn: "/signin",
   },
+  secret: "i-am-a-secret",
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.phone = user.phone;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id as number;
+      session.user.name = token.name as string;
+      session.user.phone = token.phone as string;
+      return session;
+    },
+  },
   providers: [
     Credentials({
+      id: "credentials",
+      name: "Credentials",
       credentials: {
         id: { label: "name", type: "text", placeholder: "" },
       },

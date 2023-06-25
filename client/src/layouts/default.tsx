@@ -12,19 +12,38 @@ import {
   Drawer,
   DrawerContent,
   Text,
-  useDisclosure,
   BoxProps,
   FlexProps,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   MenuList,
   Avatar,
+  MenuDivider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Stack,
+  Input,
+  ButtonGroup,
+  Button,
+  Heading,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiChevronDown, FiUser } from "react-icons/fi";
 import { IconType } from "react-icons";
 import { useRouter } from "next/router";
+import { signOut, useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { signUpSchema } from "@/lib/schema";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import Multiselect from "@/components/Multiselect";
 
 interface LinkItemProps {
   name: string;
@@ -37,9 +56,15 @@ const LinkItems: Array<LinkItemProps> = [
 ];
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const session = useSession({ required: true });
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  if (session.status === "loading") return null;
+  if (!session.data) router.push("/signin");
+
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.800")} w="full">
+    <Box minH="100vh" bg={"gray.50"} w="full">
       <SidebarContent
         onClose={() => onClose}
         display={{ base: "none", md: "block" }}
@@ -57,7 +82,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      <MobileNav onOpen={onOpen} />
+      <MobileNav onMenuOpen={onOpen} name={session.data.user?.name} />
       <Box ml={{ base: 0, md: 60 }} p="5">
         {children}
       </Box>
@@ -154,74 +179,190 @@ const NavItem = ({ icon, children, href, isActive, ...rest }: NavItemProps) => {
 };
 
 interface MobileProps extends FlexProps {
-  onOpen: () => void;
+  onMenuOpen: () => void;
+  name?: string | null;
 }
-const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+const MobileNav = ({ onMenuOpen, name, ...rest }: MobileProps) => {
+  const session = useSession();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: session.data?.user.name,
+      phone: session.data?.user.phone,
+    },
+  });
+
+  const editProfile = useMutation({
+    mutationKey: [`teacher/edit/${session.data?.user.id}`],
+    mutationFn: async (data: z.infer<typeof signUpSchema>) => {
+      const res = await fetch(
+        `http://localhost:8080/api/v1/teacher/${session.data?.user.id}`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.json();
+    },
+    onSuccess: () => {
+      onClose();
+    },
+  });
+
   return (
-    <Flex
-      ml={{ base: 0, md: 60 }}
-      px={{ base: 4, md: 4 }}
-      height="20"
-      alignItems="center"
-      bg={useColorModeValue("white", "gray.900")}
-      borderBottomWidth="1px"
-      borderBottomColor={useColorModeValue("gray.200", "gray.700")}
-      justifyContent={{ base: "space-between", md: "flex-end" }}
-      {...rest}
-    >
-      <IconButton
-        display={{ base: "flex", md: "none" }}
-        onClick={onOpen}
-        variant="outline"
-        aria-label="open menu"
-        icon={<FiMenu />}
-      />
-      <Text
-        display={{ base: "flex", md: "none" }}
-        fontSize="2xl"
-        fontFamily="monospace"
-        fontWeight="bold"
-        userSelect="none"
+    <>
+      <Flex
+        ml={{ base: 0, md: 60 }}
+        px={{ base: 4, md: 4 }}
+        height="20"
+        alignItems="center"
+        bg={useColorModeValue("white", "gray.900")}
+        borderBottomWidth="1px"
+        borderBottomColor={useColorModeValue("gray.200", "gray.700")}
+        justifyContent={{ base: "space-between", md: "flex-end" }}
+        {...rest}
       >
-        EventPlanner
-      </Text>
-      <HStack spacing={{ base: "0", md: "6" }}>
-        <Flex alignItems={"center"}>
-          <Menu>
-            <MenuButton
-              py={2}
-              transition="all 0.3s"
-              _focus={{ boxShadow: "none" }}
-            >
-              <HStack>
-                <VStack
-                  display={{ base: "none", md: "flex" }}
-                  alignItems="flex-start"
-                  spacing="1px"
-                  ml="2"
+        <IconButton
+          display={{ base: "flex", md: "none" }}
+          onClick={onMenuOpen}
+          variant="outline"
+          aria-label="Открыть меню"
+          icon={<FiMenu />}
+        />
+        <Text
+          display={{ base: "flex", md: "none" }}
+          fontSize="2xl"
+          fontFamily="monospace"
+          fontWeight="bold"
+          userSelect="none"
+        >
+          EventPlanner
+        </Text>
+        <HStack spacing={{ base: "0", md: "6" }}>
+          <Flex alignItems={"center"}>
+            <Menu>
+              <MenuButton
+                py={2}
+                transition="all 0.3s"
+                _focus={{ boxShadow: "none" }}
+              >
+                <HStack>
+                  <VStack
+                    display={{ base: "none", md: "flex" }}
+                    alignItems="flex-start"
+                    spacing="1px"
+                    ml="2"
+                  >
+                    <HStack>
+                      <Avatar
+                        size={"sm"}
+                        src={
+                          "https://avatars.dicebear.com/api/male/username.svg"
+                        }
+                      />
+                      <Text fontSize="lg">{name}</Text>
+                    </HStack>
+                  </VStack>
+                  <Box display={{ base: "none", md: "flex" }}>
+                    <FiChevronDown />
+                  </Box>
+                </HStack>
+              </MenuButton>
+              <MenuList
+                bg={useColorModeValue("white", "gray.900")}
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+              >
+                <MenuItem onClick={onOpen}>Профиль</MenuItem>
+                <MenuDivider />
+                <MenuItem onClick={() => signOut()}>Выйти</MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
+        </HStack>
+      </Flex>
+      <Modal onClose={onClose} isOpen={isOpen} isCentered size="3xl">
+        <ModalOverlay />
+        <ModalContent
+          mx="2.5"
+          as="form"
+          onSubmit={handleSubmit((data) => editProfile.mutate(data))}
+        >
+          <ModalHeader>Информация о пользователе</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Box>
+              <Stack spacing={4}>
+                <Heading as="h4" size="md" fontWeight="medium">
+                  Ваш уникальный идентификатор: {session.data?.user.id}
+                </Heading>
+                <Input
+                  placeholder="Ваше имя"
+                  bg={"gray.100"}
+                  border={0}
+                  color={"gray.700"}
+                  _placeholder={{
+                    color: "gray.500",
+                  }}
+                  autoComplete="off"
+                  {...register("name")}
+                />
+                <Input
+                  placeholder="+7 (___) ___-__-__"
+                  bg={"gray.100"}
+                  border={0}
+                  color={"gray.700"}
+                  _placeholder={{
+                    color: "gray.500",
+                  }}
+                  {...register("phone")}
+                />
+                <Button
+                  variant="outline"
+                  colorScheme="red"
+                  size={"sm"}
+                  onClick={async () => {
+                    await fetch(
+                      `http://localhost:8080/api/v1/teacher/${session.data?.user.id}`,
+                      {
+                        method: "DELETE",
+                        headers: {
+                          Accept: "*/*",
+                        },
+                      }
+                    );
+                    signOut();
+                  }}
                 >
-                  <HStack>
-                    <Avatar
-                      size={"sm"}
-                      src={"https://avatars.dicebear.com/api/male/username.svg"}
-                    />
-                    <Text fontSize="lg">Леонид Скорик</Text>
-                  </HStack>
-                </VStack>
-                <Box display={{ base: "none", md: "flex" }}>
-                  <FiChevronDown />
-                </Box>
-              </HStack>
-            </MenuButton>
-            <MenuList
-              bg={useColorModeValue("white", "gray.900")}
-              borderColor={useColorModeValue("gray.200", "gray.700")}
-            >
-              <MenuItem>Выйти</MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </HStack>
-    </Flex>
+                  Удалить учетную запись
+                </Button>
+              </Stack>
+            </Box>
+          </ModalBody>
+          <ModalFooter>
+            <ButtonGroup>
+              <Button
+                type="submit"
+                bgColor={"green.400"}
+                textColor={"white"}
+                isLoading={editProfile.isLoading}
+                onClick={() => console.log(errors)}
+              >
+                Сохранить
+              </Button>
+              <Button onClick={onClose}>Закрыть</Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };

@@ -1,3 +1,4 @@
+import { signUpSchema } from "@/lib/schema";
 import {
   Box,
   Flex,
@@ -13,6 +14,12 @@ import {
   useBreakpointValue,
   Link,
 } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const avatars = [
   {
@@ -38,7 +45,39 @@ const avatars = [
 ];
 
 export default function SignUp() {
+  const session = useSession();
+  const router = useRouter();
+
+  const { handleSubmit, register } = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+  });
+
+  const signUpAction = useMutation({
+    mutationKey: ["signUp"],
+    mutationFn: async (data: z.infer<typeof signUpSchema>) => {
+      const res = await fetch(`http://localhost:8080/api/v1/teacher`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      router.push("/events");
+    },
+  });
+
   const avatarSize = useBreakpointValue({ base: "md", md: "lg" });
+
+  if (session.status === "loading") return null;
+  if (session.status === "authenticated") {
+    router.push("/events");
+    return null;
+  }
+
   return (
     <Box position={"relative"}>
       <Container
@@ -99,8 +138,8 @@ export default function SignUp() {
               bg={"gray.800"}
               color={"white"}
               rounded={"full"}
-              minWidth={useBreakpointValue({ base: "44px", md: "60px" })}
-              minHeight={useBreakpointValue({ base: "44px", md: "60px" })}
+              minWidth={"60px"}
+              minHeight={"60px"}
               position={"relative"}
               _before={{
                 content: '""',
@@ -141,31 +180,45 @@ export default function SignUp() {
                 !
               </Text>
             </Heading>
-            <Text color={"gray.500"} fontSize={{ base: "sm", sm: "md" }}>
+            <Text color={"gray.700"} fontSize={{ base: "sm", sm: "md" }}>
               Наше приложение предоставляет простой и интуитивно понятный
               интерфейс, позволяющий создавать и организовывать бюджеты для
               различных мероприятий.
             </Text>
           </Stack>
-          <Box as={"form"}>
+          <Box
+            as={"form"}
+            onSubmit={handleSubmit((data) => {
+              const body = {
+                ...data,
+                eventsIds: [null],
+                groupsIds: [null],
+                organizationEventsIds: [null],
+              };
+              signUpAction.mutate(body);
+            })}
+          >
             <Stack spacing={4}>
               <Input
                 placeholder="Ваше имя"
                 bg={"gray.100"}
                 border={0}
-                color={"gray.500"}
+                color={"gray.700"}
                 _placeholder={{
                   color: "gray.500",
                 }}
+                autoComplete="off"
+                {...register("name")}
               />
               <Input
                 placeholder="+7 (___) ___-__-__"
                 bg={"gray.100"}
                 border={0}
-                color={"gray.500"}
+                color={"gray.700"}
                 _placeholder={{
                   color: "gray.500",
                 }}
+                {...register("phone")}
               />
               <Stack pt={6}>
                 <Text align={"center"}>
@@ -183,6 +236,7 @@ export default function SignUp() {
                 _hover={{
                   bgColor: "green.500",
                 }}
+                type={"submit"}
               >
                 Присоединиться
               </Button>

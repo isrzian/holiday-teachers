@@ -30,7 +30,7 @@ export default function Home() {
               Ваших мероприятий <br />
             </Text>
           </Heading>
-          <Text color={"gray.500"}>
+          <Text color={"gray.700"}>
             Инструмент для тех, кто хочет эффективно планировать бюджет на любые
             мероприятия и развлечения.
           </Text>

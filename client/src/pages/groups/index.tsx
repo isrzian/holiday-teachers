@@ -17,12 +17,64 @@ import {
   Stack,
   Box,
   Input,
-  Textarea,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Multiselect from "@/components/Multiselect";
+import { groupSchema } from "@/lib/schema";
 
 export default function Groups() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const {
+    handleSubmit,
+    register,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm<z.infer<typeof groupSchema>>({
+    resolver: zodResolver(
+      groupSchema.omit({
+        eventsIds: true,
+        itemsIds: true,
+        teachersIds: true,
+      })
+    ),
+  });
+
+  const queryClient = useQueryClient();
+  const createGroup = useMutation({
+    mutationKey: ["groups/create"],
+    mutationFn: async (data: z.infer<typeof groupSchema>) => {
+      const res = await fetch(`http://localhost:8080/api/v1/group`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["groups"]);
+      onClose();
+      reset();
+    },
+  });
+
+  const teachers = useQuery({
+    queryKey: ["teachers"],
+    queryFn: () =>
+      fetch("http://localhost:8080/api/v1/teacher", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
+  });
 
   const groups = useQuery({
     queryKey: ["groups"],
@@ -71,14 +123,32 @@ export default function Groups() {
             gap={4}
           >
             {groups.data.items.map((g: any) => (
-              <Group key={g.id} name={g.name} />
+              <Group key={g.id} id={g.id} defaultValues={g} />
             ))}
           </Grid>
         )}
       </RootLayout>
       <Modal onClose={onClose} isOpen={isOpen} isCentered size="3xl">
         <ModalOverlay />
-        <ModalContent mx="2.5">
+        <ModalContent
+          mx="2.5"
+          as="form"
+          onSubmit={handleSubmit((data) => {
+            const body = {
+              ...data,
+              eventsIds: !!data.events
+                ? data.events.map((event) => event.id)
+                : [null],
+              teachersIds: !!data.teachers
+                ? data.teachers.map((teacher) => teacher.id)
+                : [null],
+              itemsIds: !!data.items
+                ? data.items.map((item) => item.id)
+                : [null],
+            };
+            createGroup.mutate(body);
+          })}
+        >
           <ModalHeader>Добавить новый коллектив</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -88,20 +158,31 @@ export default function Groups() {
                   placeholder="Название коллектива"
                   bg={"gray.100"}
                   border={0}
-                  color={"gray.500"}
+                  color={"gray.700"}
                   _placeholder={{
                     color: "gray.500",
                   }}
+                  {...register("name")}
+                  autoComplete="off"
                 />
-                <Textarea
-                  placeholder="Описание коллектива"
-                  bg={"gray.100"}
-                  border={0}
-                  color={"gray.500"}
-                  _placeholder={{
-                    color: "gray.500",
-                  }}
-                  rows={10}
+                <Multiselect<any, any, true>
+                  name={"teachers"}
+                  control={control}
+                  placeholder="Участники"
+                  isMulti
+                  options={teachers.data?.items || []}
+                />
+                <Multiselect<any, any, true>
+                  name={"events"}
+                  control={control}
+                  placeholder="Мероприятия"
+                  isMulti
+                />
+                <Multiselect<any, any, true>
+                  name={"items"}
+                  control={control}
+                  placeholder="Вложения"
+                  isMulti
                 />
               </Stack>
             </Box>
@@ -109,9 +190,11 @@ export default function Groups() {
           <ModalFooter>
             <ButtonGroup>
               <Button
-                onClick={onClose}
+                type="submit"
                 bgColor={"green.400"}
                 textColor={"white"}
+                isLoading={createGroup.isLoading}
+                onClick={() => console.log(errors)}
               >
                 Сохранить
               </Button>

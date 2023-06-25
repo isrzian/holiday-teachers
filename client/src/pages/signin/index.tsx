@@ -6,23 +6,33 @@ import {
   Input,
   Stack,
   Text,
-  useColorModeValue,
   Link,
 } from "@chakra-ui/react";
+import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
-export default function SignIn(): JSX.Element {
+export default function SignInPage() {
+  const session = useSession();
+
+  const [id, setId] = useState<string | number | undefined>(undefined);
+
+  const router = useRouter();
+  const callbackUrl = router.query.callbackUrl as string;
+
+  if (session.status === "loading") return null;
+  if (session.status === "authenticated") {
+    router.push(callbackUrl || "/events");
+    return null;
+  }
+
   return (
-    <Flex
-      minH={"100vh"}
-      align={"center"}
-      justify={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
-    >
+    <Flex minH={"100vh"} align={"center"} justify={"center"} bg={"gray.50"}>
       <Stack
         spacing={4}
         w={"full"}
         maxW={"md"}
-        bg={useColorModeValue("white", "gray.700")}
+        bg={"white"}
         rounded={"xl"}
         boxShadow={"lg"}
         p={6}
@@ -38,6 +48,7 @@ export default function SignIn(): JSX.Element {
             type="text"
             autoComplete="off"
             autoCorrect="off"
+            onChange={(e) => setId(e.target.value)}
           />
         </FormControl>
         <Stack spacing={6}>
@@ -47,6 +58,14 @@ export default function SignIn(): JSX.Element {
             _hover={{
               bg: "green.500",
             }}
+            isDisabled={!id}
+            onClick={() =>
+              signIn("credentials", {
+                id,
+                callbackUrl,
+                redirect: false,
+              })
+            }
           >
             Войти
           </Button>
