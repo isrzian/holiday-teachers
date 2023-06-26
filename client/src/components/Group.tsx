@@ -118,6 +118,7 @@ export default function Group({
                   aria-label={`Редактировать ${data.name}`}
                   variant="outline"
                   onClick={onOpen}
+                  colorScheme="green"
                 >
                   <FiEdit />
                 </IconButton>
