@@ -329,7 +329,7 @@ const MobileNav = ({ onMenuOpen, name, ...rest }: MobileProps) => {
               >
                 Удалить
               </Button>
-              <Button onClick={onClose}>Отменить</Button>
+              <Button onClick={deletionDisclosure.onClose}>Отменить</Button>
             </ButtonGroup>
           </ModalFooter>
         </ModalContent>
