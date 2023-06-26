@@ -7,6 +7,7 @@ import {
   Stack,
   Text,
   Link,
+  Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
@@ -18,6 +19,7 @@ export default function SignInPage() {
   const [id, setId] = useState<string | number | undefined>(undefined);
 
   const router = useRouter();
+  const user = router.query.user as string;
   const callbackUrl = router.query.callbackUrl as string;
 
   if (session.status === "loading") return null;
@@ -27,7 +29,31 @@ export default function SignInPage() {
   }
 
   return (
-    <Flex minH={"100vh"} align={"center"} justify={"center"} bg={"gray.50"}>
+    <Flex
+      minH={"100vh"}
+      direction={"column"}
+      align={"center"}
+      justify={"center"}
+      bg={"gray.50"}
+    >
+      {!!user && (
+        <Stack
+          spacing={2}
+          w={"full"}
+          maxW={"md"}
+          bg={"green.400"}
+          rounded={"xl"}
+          p={6}
+        >
+          <Heading as="h2" size="md" textColor="white">
+            Учетная запись создана
+          </Heading>
+          <Text textColor="white">
+            Ваш уникальный идентификатор для входа:{" "}
+            <span style={{ fontWeight: "bold" }}>{user}</span>
+          </Text>
+        </Stack>
+      )}
       <Stack
         spacing={4}
         w={"full"}

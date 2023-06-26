@@ -43,7 +43,6 @@ import { signUpSchema } from "@/lib/schema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import Multiselect from "@/components/Multiselect";
 
 interface LinkItemProps {
   name: string;
@@ -184,6 +183,7 @@ interface MobileProps extends FlexProps {
 }
 const MobileNav = ({ onMenuOpen, name, ...rest }: MobileProps) => {
   const session = useSession();
+  const deletionDisclosure = useDisclosure();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     handleSubmit,
@@ -289,6 +289,51 @@ const MobileNav = ({ onMenuOpen, name, ...rest }: MobileProps) => {
           </Flex>
         </HStack>
       </Flex>
+      <Modal
+        onClose={deletionDisclosure.onClose}
+        isOpen={deletionDisclosure.isOpen}
+        isCentered
+        size="3xl"
+      >
+        <ModalOverlay />
+        <ModalContent mx="2.5">
+          <ModalHeader>Подтверждение</ModalHeader>
+          <ModalBody>
+            <Heading size="md">
+              Вы собираетесь удалить свою учетную запись. Это действие
+              невозможно отменить. Вы уверены?
+            </Heading>
+          </ModalBody>
+          <ModalCloseButton />
+          <ModalFooter>
+            <ButtonGroup>
+              <Button
+                type="submit"
+                bgColor={"red.400"}
+                _hover={{
+                  bgColor: "red.500",
+                }}
+                textColor={"white"}
+                onClick={async () => {
+                  await fetch(
+                    `http://localhost:8080/api/v1/teacher/${session.data?.user.id}`,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        Accept: "*/*",
+                      },
+                    }
+                  );
+                  signOut();
+                }}
+              >
+                Удалить
+              </Button>
+              <Button onClick={onClose}>Отменить</Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Modal onClose={onClose} isOpen={isOpen} isCentered size="3xl">
         <ModalOverlay />
         <ModalContent
@@ -329,17 +374,9 @@ const MobileNav = ({ onMenuOpen, name, ...rest }: MobileProps) => {
                   variant="outline"
                   colorScheme="red"
                   size={"sm"}
-                  onClick={async () => {
-                    await fetch(
-                      `http://localhost:8080/api/v1/teacher/${session.data?.user.id}`,
-                      {
-                        method: "DELETE",
-                        headers: {
-                          Accept: "*/*",
-                        },
-                      }
-                    );
-                    signOut();
+                  onClick={() => {
+                    onClose();
+                    deletionDisclosure.onOpen();
                   }}
                 >
                   Удалить учетную запись

@@ -68,8 +68,8 @@ export default function Events() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["events"]);
-      // onClose();
-      // reset();
+      onClose();
+      reset();
     },
   });
 
@@ -141,13 +141,18 @@ export default function Events() {
             }}
             gap={{ base: "8", sm: "12", md: "16" }}
           >
-            {events.data.items.map((e: any) => (
-              <Event key={e.id} {...e} />
-            ))}
+            {events.data &&
+              events.data.items?.map((e: any) => <Event key={e.id} {...e} />)}
           </Grid>
         )}
       </RootLayout>
-      <Modal onClose={onClose} isOpen={isOpen} isCentered size="3xl">
+      <Modal
+        onClose={onClose}
+        isOpen={isOpen}
+        isCentered
+        size="3xl"
+        closeOnOverlayClick={false}
+      >
         <ModalOverlay />
         <ModalContent
           mx="2.5"
@@ -155,7 +160,7 @@ export default function Events() {
           onSubmit={handleSubmit((data) => {
             const body = {
               ...data,
-              organizerId: session.data?.user.id || 0,
+              organizerId: session.data?.user.id!,
               budget: parseInt(data.budget),
               groupsIds: !!data.groups
                 ? data.groups.map((group) => group.id)
@@ -281,7 +286,7 @@ export default function Events() {
                 type={"submit"}
                 bgColor={"green.400"}
                 textColor={"white"}
-                // onClick={() => console.log(errors)}
+                isLoading={createEvent.isLoading}
               >
                 Сохранить
               </Button>

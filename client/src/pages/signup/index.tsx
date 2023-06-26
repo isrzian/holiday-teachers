@@ -13,6 +13,7 @@ import {
   AvatarGroup,
   useBreakpointValue,
   Link,
+  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -47,6 +48,7 @@ const avatars = [
 export default function SignUp() {
   const session = useSession();
   const router = useRouter();
+  const toast = useToast();
 
   const { handleSubmit, register } = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -65,8 +67,8 @@ export default function SignUp() {
       });
       return res.json();
     },
-    onSuccess: () => {
-      router.push("/events");
+    onSuccess: (res) => {
+      router.push(`/signin?user=${res.id}`);
     },
   });
 
@@ -237,6 +239,7 @@ export default function SignUp() {
                   bgColor: "green.500",
                 }}
                 type={"submit"}
+                isLoading={signUpAction.isLoading}
               >
                 Присоединиться
               </Button>
