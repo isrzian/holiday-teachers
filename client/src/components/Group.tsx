@@ -84,6 +84,17 @@ export default function Group({
     },
   });
 
+  const events = useQuery({
+    queryKey: ["events"],
+    queryFn: () =>
+      fetch("http://localhost:8080/api/v1/event", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
+  });
+
   const teachers = useQuery({
     queryKey: ["teachers"],
     queryFn: () =>
@@ -169,7 +180,7 @@ export default function Group({
                 </Stack>
               </Stack>
             </HStack>
-            <Button
+            {/* <Button
               w={"full"}
               mt={8}
               bg={"green.400"}
@@ -182,7 +193,7 @@ export default function Group({
               }}
             >
               Присоединиться
-            </Button>
+            </Button> */}
           </Box>
         </Box>
       </Center>
@@ -235,6 +246,7 @@ export default function Group({
                   control={control}
                   placeholder="Мероприятия"
                   isMulti
+                  options={events.data?.items || []}
                 />
                 <Multiselect<any, any, true>
                   name={"items"}

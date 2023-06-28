@@ -13,7 +13,6 @@ import {
   AvatarGroup,
   useBreakpointValue,
   Link,
-  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -48,7 +47,6 @@ const avatars = [
 export default function SignUp() {
   const session = useSession();
   const router = useRouter();
-  const toast = useToast();
 
   const { handleSubmit, register } = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),

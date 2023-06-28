@@ -39,7 +39,7 @@ export default function Event(props: z.infer<typeof eventSchema>) {
   const localizedEndDate = localizeDate(props.endDate);
 
   return (
-    <Center py={6}>
+    <Center>
       <Box w={"full"} bg={"white"} rounded={"sm"} p={6} overflow={"hidden"}>
         <Stack>
           <HStack>

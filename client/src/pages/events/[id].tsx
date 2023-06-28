@@ -150,24 +150,6 @@ const EventPageContent = (props: z.infer<typeof eventSchema>) => {
               : "Нет участников мероприятия"}
           </Text> */}
         </Flex>
-        <ButtonGroup>
-          <Button
-            my="5"
-            colorScheme="purple"
-            variant="outline"
-            onClick={onOpen}
-          >
-            Добавить предмет(-ы)
-          </Button>
-          <Button
-            my="5"
-            colorScheme="green"
-            variant="outline"
-            onClick={moneyDisclosure.onOpen}
-          >
-            Сделать вклад в бюджет
-          </Button>
-        </ButtonGroup>
         <TableContainer>
           <Table variant="simple">
             <TableCaption fontSize="xl">
@@ -216,103 +198,6 @@ const EventPageContent = (props: z.infer<typeof eventSchema>) => {
           </Table>
         </TableContainer>
       </RootLayout>
-      <Modal
-        onClose={moneyDisclosure.onClose}
-        isOpen={moneyDisclosure.isOpen}
-        isCentered
-        size="3xl"
-      >
-        <ModalOverlay />
-        <ModalContent mx="2.5">
-          <ModalHeader>Сделать вклад</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box>
-              <Stack spacing={4}>
-                <Input
-                  placeholder="Сумма (₽)"
-                  bg={"gray.100"}
-                  border={0}
-                  color={"gray.700"}
-                  _placeholder={{
-                    color: "gray.500",
-                  }}
-                />
-              </Stack>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <ButtonGroup>
-              <Button bgColor={"green.400"} textColor={"white"}>
-                Внести
-              </Button>
-              <Button onClick={moneyDisclosure.onClose}>Отменить</Button>
-            </ButtonGroup>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <Modal onClose={onClose} isOpen={isOpen} isCentered size="3xl">
-        <ModalOverlay />
-        <ModalContent mx="2.5">
-          <ModalHeader>Добавить предмет(-ы)</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box>
-              <Stack spacing={4}>
-                <Input
-                  placeholder="Наименование"
-                  bg={"gray.100"}
-                  border={0}
-                  color={"gray.700"}
-                  _placeholder={{
-                    color: "gray.500",
-                  }}
-                />
-                <Textarea
-                  placeholder="Описание"
-                  bg={"gray.100"}
-                  border={0}
-                  color={"gray.700"}
-                  _placeholder={{
-                    color: "gray.500",
-                  }}
-                  rows={5}
-                />
-                <Input
-                  placeholder="Количество"
-                  bg={"gray.100"}
-                  border={0}
-                  color={"gray.700"}
-                  _placeholder={{
-                    color: "gray.500",
-                  }}
-                />
-                <Input
-                  placeholder="Стоимость (₽)"
-                  bg={"gray.100"}
-                  border={0}
-                  color={"gray.700"}
-                  _placeholder={{
-                    color: "gray.500",
-                  }}
-                />
-              </Stack>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <ButtonGroup>
-              <Button
-                onClick={onClose}
-                bgColor={"purple.400"}
-                textColor={"white"}
-              >
-                Добавить
-              </Button>
-              <Button onClick={onClose}>Отменить</Button>
-            </ButtonGroup>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </>
   );
 };

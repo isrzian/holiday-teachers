@@ -35,6 +35,8 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiChevronDown, FiUser } from "react-icons/fi";
+import { HiUserGroup } from "react-icons/hi";
+import { GiBeerBottle } from "react-icons/gi";
 import { IconType } from "react-icons";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
@@ -51,7 +53,9 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: "Мероприятия", icon: FiHome, href: "/events" },
-  { name: "Коллективы", icon: FiUser, href: "/groups" },
+  { name: "Преподаватели", icon: FiUser, href: "/teachers" },
+  { name: "Коллективы", icon: HiUserGroup, href: "/groups" },
+  { name: "Инвентарь", icon: GiBeerBottle, href: "/items" },
 ];
 
 export default function RootLayout({ children }: { children: ReactNode }) {

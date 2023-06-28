@@ -139,7 +139,7 @@ export default function Events() {
               lg: "repeat(2, 1fr)",
               xl: "repeat(4, 1fr)",
             }}
-            gap={{ base: "8", sm: "12", md: "16" }}
+            gap={4}
           >
             {events.data &&
               events.data.items?.map((e: any) => <Event key={e.id} {...e} />)}

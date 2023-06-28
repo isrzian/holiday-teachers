@@ -5,6 +5,16 @@ export const signUpSchema = z.object({
   phone: z.string(),
 });
 
+export const itemsSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  eventId: z.string().optional(),
+  quantity: z.any().optional(),
+  price: z.any().optional(),
+  status: z.string(),
+  isMoney: z.boolean().optional(),
+});
+
 export const groupSchema = z.object({
   name: z.string(),
   eventsIds: z.array(z.number().nullable()),
