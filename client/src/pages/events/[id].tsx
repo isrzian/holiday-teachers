@@ -63,7 +63,11 @@ const EventPageContent = ({
         teachersIds: true,
       })
     ),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      startDate: new Date(defaultValues.startDate).toISOString().split("T")[0],
+      endDate: new Date(defaultValues.startDate).toISOString().split("T")[0],
+    },
   });
 
   const localizedStartDate = localizeDate(defaultValues?.startDate);
