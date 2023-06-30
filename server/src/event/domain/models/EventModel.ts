@@ -91,7 +91,9 @@ export class EventModel {
     })
     endDate: string;
 
-    @IntegerField()
+    @IntegerField({
+        nullable: true,
+    })
     budget: number;
 
     @RelationIdField({
