@@ -57,7 +57,9 @@ export default function Group({
     resolver: zodResolver(
       groupSchema.omit({
         eventsIds: true,
+        events: true,
         itemsIds: true,
+        items: true,
         teachersIds: true,
       })
     ),
@@ -84,16 +86,16 @@ export default function Group({
     },
   });
 
-  const events = useQuery({
-    queryKey: ["events"],
-    queryFn: () =>
-      fetch("http://localhost:8080/api/v1/event", {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      }).then((res) => res.json()),
-  });
+  // const events = useQuery({
+  //   queryKey: ["events"],
+  //   queryFn: () =>
+  //     fetch("http://localhost:8080/api/v1/event", {
+  //       method: "GET",
+  //       headers: {
+  //         Accept: "application/json",
+  //       },
+  //     }).then((res) => res.json()),
+  // });
 
   const teachers = useQuery({
     queryKey: ["teachers"],
@@ -240,19 +242,6 @@ export default function Group({
                   placeholder="Участники"
                   isMulti
                   options={teachers.data?.items || []}
-                />
-                <Multiselect<any, any, true>
-                  name={"events"}
-                  control={control}
-                  placeholder="Мероприятия"
-                  isMulti
-                  options={events.data?.items || []}
-                />
-                <Multiselect<any, any, true>
-                  name={"items"}
-                  control={control}
-                  placeholder="Вложения"
-                  isMulti
                 />
               </Stack>
             </Box>

@@ -34,13 +34,9 @@ export default function Events() {
   const session = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const {
-    handleSubmit,
-    register,
-    control,
-    // formState: { errors },
-    reset,
-  } = useForm<z.infer<typeof eventSchema>>({
+  const { handleSubmit, register, control, reset } = useForm<
+    z.infer<typeof eventSchema>
+  >({
     resolver: zodResolver(
       eventSchema.omit({
         organizerId: true,
@@ -160,7 +156,7 @@ export default function Events() {
           onSubmit={handleSubmit((data) => {
             const body = {
               ...data,
-              organizerId: session.data?.user.id!,
+              organizerId: data.organizer.id,
               budget: parseInt(data.budget),
               groupsIds: !!data.groups
                 ? data.groups.map((group) => group.id)
@@ -180,6 +176,12 @@ export default function Events() {
           <ModalBody>
             <Box>
               <Stack spacing={4}>
+                <Multiselect<any, any, true>
+                  name={"organizer"}
+                  placeholder="Организатор"
+                  options={teachers.data?.items}
+                  control={control}
+                />
                 <Select
                   placeholder="Статус мероприятия"
                   bg={"gray.100"}

@@ -47,6 +47,10 @@ export const groupSchema = z.object({
 });
 
 export const eventSchema = z.object({
+  organizer: z.object({
+    id: z.number(),
+    name: z.string(),
+  }),
   organizerId: z.number(),
   name: z.string(),
   description: z.string(),

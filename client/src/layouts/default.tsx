@@ -60,11 +60,11 @@ const LinkItems: Array<LinkItemProps> = [
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const session = useSession({ required: true });
+  // const session = useSession({ required: true });
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  if (session.status === "loading") return null;
-  if (!session.data) router.push("/signin");
+  // if (session.status === "loading") return null;
+  // if (!session.data) router.push("/signin");
 
   return (
     <Box minH="100vh" bg={"gray.50"} w="full">
@@ -85,7 +85,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      <MobileNav onMenuOpen={onOpen} name={session.data.user?.name} />
+      {/* <MobileNav onMenuOpen={onOpen} name={"Пользователь"} /> */}
       <Box ml={{ base: 0, md: 60 }} p="5">
         {children}
       </Box>

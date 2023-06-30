@@ -37,6 +37,8 @@ export default function Groups() {
   } = useForm<z.infer<typeof groupSchema>>({
     resolver: zodResolver(
       groupSchema.omit({
+        events: true,
+        items: true,
         eventsIds: true,
         itemsIds: true,
         teachersIds: true,
@@ -172,18 +174,18 @@ export default function Groups() {
                   isMulti
                   options={teachers.data?.items || []}
                 />
-                <Multiselect<any, any, true>
-                  name={"events"}
-                  control={control}
-                  placeholder="Мероприятия"
-                  isMulti
-                />
-                <Multiselect<any, any, true>
-                  name={"items"}
-                  control={control}
-                  placeholder="Вложения"
-                  isMulti
-                />
+                {/* <Multiselect<any, any, true> */}
+                {/*   name={"events"} */}
+                {/*   control={control} */}
+                {/*   placeholder="Мероприятия" */}
+                {/*   isMulti */}
+                {/* /> */}
+                {/* <Multiselect<any, any, true> */}
+                {/*   name={"items"} */}
+                {/*   control={control} */}
+                {/*   placeholder="Вложения" */}
+                {/*   isMulti */}
+                {/* /> */}
               </Stack>
             </Box>
           </ModalBody>
