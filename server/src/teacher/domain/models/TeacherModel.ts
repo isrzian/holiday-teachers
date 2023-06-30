@@ -29,6 +29,7 @@ export class TeacherModel {
         relationClass: () => GroupModel,
         isOwningSide: false,
         isArray: true,
+        inverseSide: (group: GroupModel) => group.teachers,
     })
     groups: GroupModel[];
 
@@ -43,6 +44,7 @@ export class TeacherModel {
         relationClass: () => EventModel,
         isOwningSide: false,
         isArray: true,
+        inverseSide: (event: EventModel) => event.teachers,
     })
     events: EventModel[];
 

@@ -26,6 +26,7 @@ export class GroupModel {
         type: 'ManyToMany',
         relationClass: () => TeacherModel,
         isOwningSide: true,
+        inverseSide: (teacher: TeacherModel) => teacher.groups,
     })
     teachers: TeacherModel[];
 
@@ -40,6 +41,7 @@ export class GroupModel {
         relationClass: () => EventModel,
         isOwningSide: false,
         isArray: true,
+        inverseSide: (event: EventModel) => event.groups,
     })
     events: EventModel[];
 
