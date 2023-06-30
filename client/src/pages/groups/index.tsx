@@ -37,8 +37,6 @@ export default function Groups() {
   } = useForm<z.infer<typeof groupSchema>>({
     resolver: zodResolver(
       groupSchema.omit({
-        events: true,
-        items: true,
         eventsIds: true,
         itemsIds: true,
         teachersIds: true,
@@ -65,6 +63,29 @@ export default function Groups() {
       onClose();
       reset();
     },
+  });
+
+  // Везде где items нужно будет поменять порт 3000 на 8080, порт 3000 это из которого некстовский (не нестовский) экспрес возвращает моковые предметы
+  const items = useQuery({
+    queryKey: ["items"],
+    queryFn: () =>
+      fetch("http://localhost:3000/api/v1/event/item", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
+  });
+
+  const events = useQuery({
+    queryKey: ["events"],
+    queryFn: () =>
+      fetch("http://localhost:8080/api/v1/event", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
   });
 
   const teachers = useQuery({
@@ -174,18 +195,20 @@ export default function Groups() {
                   isMulti
                   options={teachers.data?.items || []}
                 />
-                {/* <Multiselect<any, any, true> */}
-                {/*   name={"events"} */}
-                {/*   control={control} */}
-                {/*   placeholder="Мероприятия" */}
-                {/*   isMulti */}
-                {/* /> */}
-                {/* <Multiselect<any, any, true> */}
-                {/*   name={"items"} */}
-                {/*   control={control} */}
-                {/*   placeholder="Вложения" */}
-                {/*   isMulti */}
-                {/* /> */}
+                <Multiselect<any, any, true>
+                  name={"events"}
+                  control={control}
+                  placeholder="Мероприятия"
+                  isMulti
+                  options={events.data?.items || []}
+                />
+                <Multiselect<any, any, true>
+                  name={"items"}
+                  control={control}
+                  placeholder="Вложения"
+                  isMulti
+                  options={items.data?.items || []}
+                />
               </Stack>
             </Box>
           </ModalBody>

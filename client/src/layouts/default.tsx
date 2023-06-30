@@ -59,7 +59,7 @@ const LinkItems: Array<LinkItemProps> = [
 ];
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const router = useRouter();
+  // const router = useRouter();
   // const session = useSession({ required: true });
   const { isOpen, onOpen, onClose } = useDisclosure();
 

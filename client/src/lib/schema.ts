@@ -20,30 +20,9 @@ export const groupSchema = z.object({
   eventsIds: z.array(z.number().nullable()),
   itemsIds: z.array(z.number().nullable()),
   teachersIds: z.array(z.number().nullable()),
-  events: z
-    .array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-      })
-    )
-    .optional(),
-  items: z
-    .array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-      })
-    )
-    .optional(),
-  teachers: z
-    .array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-      })
-    )
-    .optional(),
+  events: z.array(z.any()).optional(),
+  items: z.array(z.any()).optional(),
+  teachers: z.array(z.any()).optional(),
 });
 
 export const eventSchema = z.object({
@@ -70,14 +49,7 @@ export const eventSchema = z.object({
       })
     )
     .optional(),
-  items: z
-    .array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-      })
-    )
-    .optional(),
+  items: z.array(z.any()).optional(),
   teachers: z
     .array(
       z.object({

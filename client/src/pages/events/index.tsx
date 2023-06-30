@@ -26,12 +26,10 @@ import {
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export default function Events() {
-  const session = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { handleSubmit, register, control, reset } = useForm<
@@ -51,7 +49,6 @@ export default function Events() {
   const createEvent = useMutation({
     mutationKey: ["events/create"],
     mutationFn: async (data: z.infer<typeof eventSchema>) => {
-      console.log(JSON.stringify(data));
       const res = await fetch(`http://localhost:8080/api/v1/event`, {
         method: "POST",
         body: JSON.stringify(data),
@@ -78,6 +75,20 @@ export default function Events() {
           Accept: "application/json",
         },
       }).then((res) => res.json()),
+  });
+
+  // Везде где items нужно будет поменять порт 3000 на 8080, порт 3000 это из которого некстовский (не нестовский) экспрес возвращает моковые предметы
+  const items = useQuery({
+    queryKey: ["items"],
+    queryFn: () =>
+      fetch("http://localhost:3000/api/v1/event/item", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const teachers = useQuery({
@@ -265,6 +276,13 @@ export default function Events() {
                     {...register("endDate")}
                   />
                 </HStack>
+                <Multiselect<any, any, true>
+                  name={"items"}
+                  placeholder="Вложения"
+                  options={items.data?.items}
+                  control={control}
+                  isMulti
+                />
                 <Multiselect<any, any, true>
                   name={"groups"}
                   placeholder="Организующий коллектив"

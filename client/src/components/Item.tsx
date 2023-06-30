@@ -1,4 +1,5 @@
-import { signUpSchema } from "@/lib/schema";
+import { ItemStatus } from "@/lib/consts";
+import { itemsSchema } from "@/lib/schema";
 import {
   Box,
   Center,
@@ -19,49 +20,49 @@ import {
   useDisclosure,
   Input,
   Button,
+  Select,
+  Textarea,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { FiTrash, FiEdit, FiPhone } from "react-icons/fi";
 import { z } from "zod";
 
-export default function Teacher({
+export default function Item({
   id,
   defaultValues,
 }: {
   id: number;
   defaultValues: any;
 }) {
-  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { data, isLoading } = useQuery({
-    queryKey: [`teacher/${id}`],
-    queryFn: () =>
-      fetch(`http://localhost:8080/api/v1/teacher/${id}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      }).then((res) => res.json()),
-  });
+  // const { data, isLoading } = useQuery({
+  //   queryKey: [`item/${id}`],
+  //   queryFn: () =>
+  //     fetch(`http://localhost:8080/api/v1/event/item${id}`, {
+  //       method: "GET",
+  //       headers: {
+  //         Accept: "application/json",
+  //       },
+  //     }).then((res) => res.json()),
+  // });
 
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  } = useForm<z.infer<typeof itemsSchema>>({
+    resolver: zodResolver(itemsSchema),
     defaultValues,
   });
 
   const queryClient = useQueryClient();
   const editTeacher = useMutation({
-    mutationKey: [`teachers/edit/${id}`],
-    mutationFn: async (data: z.infer<typeof signUpSchema>) => {
-      const res = await fetch(`http://localhost:8080/api/v1/teacher/${id}`, {
+    mutationKey: [`items/edit/${id}`],
+    mutationFn: async (data: z.infer<typeof itemsSchema>) => {
+      const res = await fetch(`http://localhost:8080/api/v1/event/item/${id}`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -72,24 +73,33 @@ export default function Teacher({
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries([`teacher/${id}`]);
+      queryClient.invalidateQueries([`item/${id}`]);
       onClose();
     },
   });
 
-  if (isLoading || !data) return null;
+  // if (isLoading || !data) return null;
 
   return (
     <>
       <Center>
-        <Box w={"full"} bg={"white"} rounded={"sm"} p={6} overflow={"hidden"}>
+        <Box
+          w={"full"}
+          bg={"white"}
+          rounded={"sm"}
+          p={6}
+          overflow={"hidden"}
+          border="1px"
+          borderStyle="dashed"
+          borderColor={defaultValues.isMoney ? "green.500" : "purple.500"}
+        >
           <Text fontSize="sm" textColor="gray.500">
-            ID {id}
+            ID {defaultValues.id}
           </Text>
           <Stack>
             <HStack>
               <Heading color={"gray.700"} fontSize={"2xl"} fontFamily={"body"}>
-                {data.name}
+                {defaultValues.name}
               </Heading>
               <Spacer />
               <ButtonGroup>
@@ -106,30 +116,10 @@ export default function Teacher({
                   size="sm"
                   variant="outline"
                   colorScheme="red"
-                  onClick={async () => {
-                    await fetch(
-                      `http://localhost:8080/api/v1/teacher/${
-                        (defaultValues as any).id
-                      }`,
-                      {
-                        method: "DELETE",
-                        headers: {
-                          Accept: "*/*",
-                        },
-                      }
-                    );
-                    queryClient.invalidateQueries([`teachers`]);
-                  }}
                 >
                   <FiTrash />
                 </IconButton>
               </ButtonGroup>
-            </HStack>
-            <HStack>
-              <FiPhone />
-              <Text color={"gray.700"} fontSize="md" fontStyle="italic">
-                {data.phone}
-              </Text>
             </HStack>
           </Stack>
         </Box>
@@ -143,13 +133,29 @@ export default function Teacher({
             editTeacher.mutate(data);
           })}
         >
-          <ModalHeader>{data.name}</ModalHeader>
+          <ModalHeader>{defaultValues.name}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Box>
               <Stack spacing={4}>
+                <Select
+                  placeholder="Статус предмета"
+                  bg={"gray.100"}
+                  border={0}
+                  color={"gray.700"}
+                  _placeholder={{
+                    color: "gray.500",
+                  }}
+                  {...register("status")}
+                >
+                  {Object.entries(ItemStatus).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </Select>
                 <Input
-                  placeholder="Ваше имя"
+                  placeholder="Название"
                   bg={"gray.100"}
                   border={0}
                   color={"gray.700"}
@@ -159,15 +165,38 @@ export default function Teacher({
                   autoComplete="off"
                   {...register("name")}
                 />
-                <Input
-                  placeholder="+7 (___) ___-__-__"
+                <Textarea
+                  placeholder="Описание"
                   bg={"gray.100"}
                   border={0}
                   color={"gray.700"}
                   _placeholder={{
                     color: "gray.500",
                   }}
-                  {...register("phone")}
+                  autoComplete="off"
+                  {...register("description")}
+                />
+                <Input
+                  placeholder="Количество"
+                  bg={"gray.100"}
+                  border={0}
+                  color={"gray.700"}
+                  _placeholder={{
+                    color: "gray.500",
+                  }}
+                  autoComplete="off"
+                  {...register("quantity")}
+                />
+                <Input
+                  placeholder="Сумма"
+                  bg={"gray.100"}
+                  border={0}
+                  color={"gray.700"}
+                  _placeholder={{
+                    color: "gray.500",
+                  }}
+                  autoComplete="off"
+                  {...register("price")}
                 />
               </Stack>
             </Box>

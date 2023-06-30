@@ -57,9 +57,7 @@ export default function Group({
     resolver: zodResolver(
       groupSchema.omit({
         eventsIds: true,
-        events: true,
         itemsIds: true,
-        items: true,
         teachersIds: true,
       })
     ),
@@ -86,16 +84,27 @@ export default function Group({
     },
   });
 
-  // const events = useQuery({
-  //   queryKey: ["events"],
-  //   queryFn: () =>
-  //     fetch("http://localhost:8080/api/v1/event", {
-  //       method: "GET",
-  //       headers: {
-  //         Accept: "application/json",
-  //       },
-  //     }).then((res) => res.json()),
-  // });
+  const items = useQuery({
+    queryKey: ["items"],
+    queryFn: () =>
+      fetch("http://localhost:8080/api/v1/item", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
+  });
+
+  const events = useQuery({
+    queryKey: ["events"],
+    queryFn: () =>
+      fetch("http://localhost:8080/api/v1/event", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }).then((res) => res.json()),
+  });
 
   const teachers = useQuery({
     queryKey: ["teachers"],
@@ -157,7 +166,9 @@ export default function Group({
             <HStack>
               <Stack direction={"row"} justify={"center"} spacing={6}>
                 <Stack spacing={0} align={"center"}>
-                  <Text fontWeight={600}>2</Text>
+                  <Text fontWeight={600}>
+                    {defaultValues.eventsIds?.length || 0}
+                  </Text>
                   <Text fontSize={"sm"} color={"gray.700"}>
                     Мероприятий
                   </Text>
@@ -166,7 +177,9 @@ export default function Group({
               <Spacer />
               <Stack direction={"row"} justify={"center"} spacing={6}>
                 <Stack spacing={0} align={"center"}>
-                  <Text fontWeight={600}>11</Text>
+                  <Text fontWeight={600}>
+                    {defaultValues.teachersIds?.length || 0}
+                  </Text>
                   <Text fontSize={"sm"} color={"gray.700"}>
                     Участников
                   </Text>
@@ -175,27 +188,15 @@ export default function Group({
               <Spacer />
               <Stack direction={"row"} justify={"center"} spacing={6}>
                 <Stack spacing={0} align={"center"}>
-                  <Text fontWeight={600}>7</Text>
+                  <Text fontWeight={600}>
+                    {defaultValues.itemsIds?.length || 0}
+                  </Text>
                   <Text fontSize={"sm"} color={"gray.700"}>
                     Предметов
                   </Text>
                 </Stack>
               </Stack>
             </HStack>
-            {/* <Button
-              w={"full"}
-              mt={8}
-              bg={"green.400"}
-              color={"white"}
-              rounded={"md"}
-              _hover={{
-                transform: "translateY(-2px)",
-                boxShadow: "lg",
-                bgColor: "green.500",
-              }}
-            >
-              Присоединиться
-            </Button> */}
           </Box>
         </Box>
       </Center>
@@ -235,6 +236,20 @@ export default function Group({
                   }}
                   {...register("name")}
                   autoComplete="off"
+                />
+                <Multiselect<any, any, true>
+                  name={"events"}
+                  control={control}
+                  placeholder="Мероприятия"
+                  isMulti
+                  options={events.data?.items || []}
+                />
+                <Multiselect<any, any, true>
+                  name={"items"}
+                  control={control}
+                  placeholder="Предметы"
+                  isMulti
+                  options={items.data?.items || []}
                 />
                 <Multiselect<any, any, true>
                   name={"teachers"}
